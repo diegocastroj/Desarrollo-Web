@@ -42,3 +42,17 @@ __screenshots__/
 # System files
 .DS_Store
 Thumbs.db
+
+
+# Dependencias (NUNCA deben subirse)
+node_modules/
+dist/
+.angular/
+
+# Archivos de configuración de VS Code y SO
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Logs
+npm-debug.log*
