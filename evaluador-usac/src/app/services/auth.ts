@@ -15,9 +15,14 @@ export class AuthService {
     return this.http.post(`${this.URL}/registro`, usuario);
   }
 
-  login(credenciales: any) {
-    return this.http.post(`${this.URL}/login`, credenciales);
-  }
+
+  login(datos: any) {
+  // Mandamos 'carnet' y 'password' al servidor
+  return this.http.post('http://localhost:3000/api/login', {
+    carnet: datos.carnet,
+    password: datos.pass 
+  });
+}
 
   validarUsuario(datos: any) {
     console.log('🌐 [AuthService] Enviando POST a:', `${this.URL}/validar-usuario`);

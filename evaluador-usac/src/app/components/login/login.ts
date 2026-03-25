@@ -1,16 +1,17 @@
 import { Component } from '@angular/core';
-import { FormsModule } from '@angular/forms';
-import { RouterLink, Router } from '@angular/router';
+import { FormsModule } from '@angular/forms'; // <--- ¡IMPORTANTE!
+import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [FormsModule, RouterLink], 
+  imports: [FormsModule, RouterLink], // <--- Verifica que estén aquí
   templateUrl: './login.html',
   styleUrl: './login.css'
 })
 export class Login {
+  // Este objeto debe llamarse igual que en el HTML
   credenciales = {
     carnet: '',
     pass: ''
@@ -18,28 +19,20 @@ export class Login {
 
   constructor(private authService: AuthService, private router: Router) {}
 
+  // Cambiamos el nombre de la función para que coincida con tu (ngSubmit)
   onSubmit(event: Event) {
-    event.preventDefault();
-    
-    if (!this.credenciales.carnet || !this.credenciales.pass) {
-      alert('⚠️ Por favor ingresa carnet y contraseña.');
-      return;
-    }
-
-    console.log('📤 [LoginComponent] Enviando credenciales');
+    event.preventDefault(); // Evita que la página se recargue
 
     this.authService.login(this.credenciales).subscribe({
-      next: (res) => {
-        console.log('📱 [LoginComponent] ✅ Respuesta recibida en el cliente:', res);
-        alert('¡Bienvenido!');
-        this.router.navigate(['/inicio']);
+      next: (res: any) => {
+        // Guardamos los datos del usuario en el navegador
+        localStorage.setItem('usuario_logueado', JSON.stringify(res.usuario));
+        
+        this.router.navigate(['/inicio']); // Te manda al Inicio
       },
       error: (err) => {
-        console.error('📱 [LoginComponent] ❌ Error en login:', err);
-        alert('❌ Los datos no coinciden con nuestros registros.');
-      },
-      complete: () => {
-        console.log('📱 [LoginComponent] ✅ Observable completado');
+        console.error(err);
+        alert('❌ Carnet o contraseña incorrectos.');
       }
     });
   }

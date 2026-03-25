@@ -125,18 +125,15 @@ app.post('/api/validar-usuario', (req, res) => {
 
 // RUTA: Login (Verificar carnet y contraseña)
 app.post('/api/login', (req, res) => {
-    const { carnet, pass } = req.body;
-    
-    // Buscamos si existe un estudiante con ese carnet y esa contraseña
+    const { carnet, password } = req.body;
     const sql = 'SELECT * FROM estudiante WHERE registro_academico = ? AND contrasena = ?';
-
-    db.query(sql, [carnet, pass], (err, results) => {
-        if (err) return res.status(500).json({ mensaje: "Error de servidor" });
-        
+    
+    db.query(sql, [carnet, password], (err, results) => {
+        if (err) return res.status(500).json({ error: "Error en DB" });
         if (results.length > 0) {
-            res.json({ mensaje: "Login exitoso", usuario: results[0] });
+            res.json({ mensaje: "OK", usuario: results });
         } else {
-            res.status(401).json({ mensaje: "Datos incorrectos" });
+            res.status(401).json({ mensaje: "Error" });
         }
     });
 });

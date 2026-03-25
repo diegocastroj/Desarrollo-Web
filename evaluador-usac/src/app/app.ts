@@ -5,14 +5,13 @@ import { RouterOutlet } from '@angular/router';
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet], // <--- 2. AGREGALO AQUÍ EN LOS IMPORTS
+  imports: [RouterOutlet], 
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
 
-export class App implements OnInit { // <-- 3. Le regresamos el nombre a "App" para que main.ts no se enoje
-  // Preparamos el "teléfono"
-  http = inject(HttpClient); 
+export class App implements OnInit { 
+  http = inject(HttpClient); // telefono para hacer llamadas HTTP
   
   // Creamos la lista vacía
   listaCatedraticos: any[] = []; 

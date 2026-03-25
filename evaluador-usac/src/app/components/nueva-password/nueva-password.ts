@@ -47,18 +47,15 @@ export class NuevaPassword {
     // Enviamos el carnet y la nueva pass al servidor para el UPDATE
     this.authService.actualizarPassword({ carnet, nuevaPass: this.passData.nuevaPass }).subscribe({
       next: (res) => {
-        console.log('✅ Contraseña actualizada:', res);
-        alert('✅ Contraseña actualizada con éxito');
+        
         sessionStorage.removeItem('carnet_pendiente'); // Limpiamos la memoria
         this.router.navigate(['/login']);
       },
       error: (err) => {
-        console.error('❌ Error al actualizar contraseña:', err);
+        
         alert('❌ Error al actualizar la contraseña. Intenta nuevamente.');
       },
-      complete: () => {
-        console.log('✅ Solicitud completada');
-      }
+      
     });
   }
 }
