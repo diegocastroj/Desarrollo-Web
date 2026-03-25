@@ -11,29 +11,35 @@
       <p>Facultad de Ingeniería</p>
     </div>
 
-    <form>
-      <div class="input-group">
-        <label for="carnet">Registro Académico (Carnet)</label>
-        <input type="text" id="carnet" placeholder="Ej. 202612345">
-      </div>
-      <div class="input-group">
-        <label for="nombres">Nombres</label>
-        <input type="text" id="nombres" >
-      </div>
-      <div class="input-group">
-        <label for="apellidos">Apellidos</label>
-        <input type="text" id="apellidos" >
-      </div>
+<form (submit)="onSubmit($event)">
+  <div class="input-group">
+    <label>Registro Académico (Carnet)</label>
+    <input type="text" name="carnet" [(ngModel)]="userData.carnet" required>
+  </div>
 
-      <div class="input-group">
-        <label for="password">Contraseña</label>
-        <input type="password" id="password" placeholder="••••••••">
-      </div>
+  <div class="input-group">
+    <label>Nombres</label>
+    <input type="text" name="nombres" [(ngModel)]="userData.nombres" required>
+  </div>
 
-      <div class="input-group">
-        <label for="password">Confirmar Contraseña</label>
-        <input type="password" id="password" placeholder="••••••••">
-      </div>
+  <div class="input-group">
+    <label>Apellidos</label>
+    <input type="text" name="apellidos" [(ngModel)]="userData.apellidos" required>
+  </div>
 
-      <button type="button" class="btn-login">Registrarse</button>
-    </form>
+  <div class="input-group">
+    <label>Correo</label>
+    <input type="email" name="correo" [(ngModel)]="userData.correo" required>
+  </div>
+
+  <div class="input-group">
+    <label>Contraseña</label>
+    <input type="password" name="pass" [(ngModel)]="userData.pass" required>
+  </div>
+
+  <button type="submit" class="btn-login">Registrarse</button>
+</form>
+
+<div class="footer-login">
+  <p>¿Ya tienes cuenta? <a routerLink="/login">Inicia Sesión</a></p>
+</div>

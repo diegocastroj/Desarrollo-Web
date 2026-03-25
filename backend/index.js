@@ -70,26 +70,102 @@ app.listen(PORT, () => {
     console.log(`Servidor del mesero corriendo en http://localhost:${PORT}`);
 });
 
-// RUTA 1: Registro de nuevo usuario
+// RUTA 1: Registro de nuevo usuario (CORREGIDA)
 app.post('/api/registro', (req, res) => {
-    const { registro_academico, nombres, apellidos, correo, contrasena } = req.body;
-    const sql = 'INSERT INTO estudiante VALUES (?, ?, ?, ?, ?)';
-    db.query(sql, [registro_academico, nombres, apellidos, correo, contrasena], (err, result) => {
-        if (err) return res.status(500).json({ mensaje: "Error al registrar. ¿Quizás el carnet ya existe?" });
+    // 1. Extraemos con los nombres que vienen de Angular
+    const { carnet, nombres, apellidos, correo, pass } = req.body; 
+
+    // 2. Query con los nombres de tus columnas en MySQL
+    // Nota: Agregamos los nombres de las columnas antes de VALUES para evitar errores de orden
+    const sql = 'INSERT INTO estudiante (registro_academico, nombres, apellidos, correo, contrasena) VALUES (?, ?, ?, ?, ?)';
+
+    db.query(sql, [carnet, nombres, apellidos, correo, pass], (err, result) => {
+        if (err) {
+            console.error("❌ Error en MySQL:", err.message);
+            // Si el error es por carnet duplicado
+            if (err.code === 'ER_DUP_ENTRY') {
+                return res.status(400).json({ mensaje: "El carnet ya existe" });
+            }
+            return res.status(500).json({ mensaje: "Error en servidor", detalle: err.message });
+        }
+        console.log("✅ Usuario guardado con éxito");
         res.json({ mensaje: "Usuario registrado con éxito" });
     });
 });
 
-// RUTA 2: Login (Verificación)
-app.post('/api/login', (req, res) => {
-    const { carnet, password } = req.body;
-    const sql = 'SELECT * FROM estudiante WHERE registro_academico = ? AND contrasena = ?';
-    db.query(sql, [carnet, password], (err, results) => {
-        if (err) return res.status(500).send("Error en servidor");
+// RUTA: Verificar si el carnet y correo existen y coinciden
+app.post('/api/validar-usuario', (req, res) => {
+    const { carnet, correo } = req.body;
+    
+    console.log("Intentando validar:", { carnet, correo }); // Debug
+    
+    // Buscamos si existe un estudiante con ese carnet Y ese correo (case-insensitive)
+    const sql = 'SELECT * FROM estudiante WHERE registro_academico = ? AND LOWER(correo) = LOWER(?)';
+
+    db.query(sql, [carnet, correo], (err, results) => {
+        if (err) {
+            console.error("Error en BD:", err);
+            return res.status(500).json({ mensaje: "Error de servidor" });
+        }
+        
+        console.log("Resultados encontrados:", results.length); // Debug
+        
         if (results.length > 0) {
-            res.json({ mensaje: "Acceso concedido", usuario: results });
+            console.log("✅ Usuario validado:", results[0]); // Debug
+            console.log('Enviando respuesta al cliente: { mensaje: "Usuario validado correctamente" }');
+            res.status(200).json({ mensaje: "Usuario validado correctamente" });
+            console.log('✅ Respuesta enviada al cliente');
+        } else {
+            console.log("❌ No se encontraron coincidencias"); // Debug
+            res.status(404).json({ mensaje: "Datos incorrectos" });
+        }
+    });
+});
+
+
+// RUTA: Login (Verificar carnet y contraseña)
+app.post('/api/login', (req, res) => {
+    const { carnet, pass } = req.body;
+    
+    // Buscamos si existe un estudiante con ese carnet y esa contraseña
+    const sql = 'SELECT * FROM estudiante WHERE registro_academico = ? AND contrasena = ?';
+
+    db.query(sql, [carnet, pass], (err, results) => {
+        if (err) return res.status(500).json({ mensaje: "Error de servidor" });
+        
+        if (results.length > 0) {
+            res.json({ mensaje: "Login exitoso", usuario: results[0] });
         } else {
             res.status(401).json({ mensaje: "Datos incorrectos" });
         }
+    });
+});
+
+// RUTA DEBUG: Ver todos los usuarios registrados (para debuggear)
+app.get('/api/debug/estudiantes', (req, res) => {
+    const sql = 'SELECT registro_academico, nombres, apellidos, correo FROM estudiante';
+    
+    db.query(sql, (err, results) => {
+        if (err) return res.status(500).json({ error: err.message });
+        res.json(results);
+    });
+});
+
+// RUTA 3: Recuperar/Cambiar Contraseña
+app.post('/api/recuperar', (req, res) => {
+    const { carnet, nuevaPass } = req.body;
+
+    // Usamos el carnet como llave para actualizar la contraseña
+    const sql = 'UPDATE estudiante SET contrasena = ? WHERE registro_academico = ?';
+
+    db.query(sql, [nuevaPass, carnet], (err, result) => {
+        if (err) return res.status(500).json({ mensaje: "Error en base de datos" });
+        
+        // Si result.affectedRows es 0, significa que el carnet no existe
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ mensaje: "El carnet no está registrado" });
+        }
+        
+        res.json({ mensaje: "Contraseña actualizada exitosamente" });
     });
 });
