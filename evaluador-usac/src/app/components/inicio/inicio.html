@@ -4,31 +4,45 @@
       <div class="avatar-circle">{{ nombreUsuario }}</div>
       <h3>{{ nombreUsuario }}</h3>
       <p>ID: {{ carnetUsuario }}</p>
+      <button class="btn-profile" [routerLink]="['/perfil', carnetUsuario]">👤 Mi Perfil</button>
       <button class="btn-logout" (click)="cerrarSesion()">Cerrar Sesión</button>
     </div>
 
     <div class="filters">
       <h4>🔍 Filtros de Búsqueda</h4>
-      <input type="text" placeholder="Buscar por Nombre..." class="search-bar">
+      <input type="text" placeholder="Buscar por Nombre..." class="search-bar" [(ngModel)]="textoBusqueda">
       
       <label>Por Curso:</label>
-      <select class="select-filter">
-        <option>Todos los cursos</option>
+      <select class="select-filter" [(ngModel)]="filtroCurso">
+        <option value="">Todos los cursos</option>
+        <option *ngFor="let curso of cursos" [value]="curso.codigo_curso">
+          {{ curso.nombre_curso }}
+        </option>
       </select>
 
       <label>Por Catedrático:</label>
-      <select class="select-filter">
-        <option>Todos los catedráticos</option>
+      <select class="select-filter" [(ngModel)]="filtroCatedratico">
+        <option value="">Todos los catedráticos</option>
+        <option *ngFor="let cat of catedraticos" [value]="cat.id_catedratico">
+          {{ cat.nombre_catedratico }}
+        </option>
       </select>
     </div>
   </aside>
 
   <main class="feed">
-    <div class="create-post" routerLink="/crear-publicacion">
-      <div class="input-fake">¿Qué estás pensando hoy?</div>
+    <div class="search-users-section">
+      <input 
+        type="text" 
+        [(ngModel)]="carnetBusqueda" 
+        placeholder="🔍 Busca usuarios por su carnet..." 
+        class="search-users-input"
+        (keyup.enter)="buscarUsuario(carnetBusqueda)"
+      >
+      <button (click)="buscarUsuario(carnetBusqueda)" class="btn-buscar-user">Buscar</button>
     </div>
 
-    <div class="post-card" *ngFor="let post of publicaciones">
+    <div class="post-card" *ngFor="let post of publicacionesFiltradas">
       <div class="post-header">
         <div class="post-info">
           <span class="author">{{ post.nombres }} {{ post.apellidos }}</span>
@@ -40,8 +54,8 @@
         <p>{{ post.mensaje }}</p>
       </div>
       <div class="post-actions">
-        <button>💬 Comentarios</button>
-        <button>👤 Ver Perfil</button>
+        <button (click)="abrirComentarios(post.id_publicacion)">💬 Comentarios</button>
+        <button [routerLink]="['/perfil', post.registro_academico]">👤 Ver Perfil</button>
       </div>
     </div>
   </main>
@@ -90,3 +104,34 @@
     <button class="btn-login" (click)="publicar()" style="width: 100%;">Publicar</button>
   </div>
 </div>
+
+<!-- MODAL DE COMENTARIOS -->
+<div class="modal-overlay" *ngIf="mostrarComentarios">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>Comentarios</h3>
+      <button (click)="cerrarComentarios()" style="border:none; background:none; cursor:pointer;">❌</button>
+    </div>
+
+    <!-- LISTA DE COMENTARIOS -->
+    <div class="comentarios-list" style="max-height: 300px; overflow-y: auto; margin-bottom: 20px; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+      <div *ngIf="comentarios.length === 0" style="color: #999; text-align: center;">
+        No hay comentarios aún. ¡Sé el primero!
+      </div>
+      
+      <div *ngFor="let comentario of comentarios" style="margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #eee;">
+        <strong>{{ comentario.nombres }} {{ comentario.apellidos }}</strong>
+        <p style="margin: 5px 0; color: #333;">{{ comentario.texto_comentario }}</p>
+      </div>
+    </div>
+
+    <!-- FORMULARIO PARA NUEVO COMENTARIO -->
+    <div class="form-group">
+      <label>Tu comentario</label>
+      <textarea rows="3" [(ngModel)]="nuevoComentario.texto" placeholder="Escribe tu comentario..."></textarea>
+    </div>
+
+    <button class="btn-login" (click)="agregarComentario()" style="width: 100%;">Comentar</button>
+  </div>
+</div>
+

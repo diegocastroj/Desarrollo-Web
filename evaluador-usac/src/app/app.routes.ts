@@ -4,7 +4,8 @@ import { Login } from './components/login/login';
 import { Registro } from './components/registro/registro';
 import { RecuperarPassword } from './components/recuperar-password/recuperar-password';
 import { Inicio } from './components/inicio/inicio';
-import { NuevaPassword } from './components/nueva-password/nueva-password'; // Ajusta la ruta
+import { NuevaPassword } from './components/nueva-password/nueva-password';
+import { Perfil } from './components/perfil/perfil';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
@@ -12,5 +13,7 @@ export const routes: Routes = [
   { path: 'registro', component: Registro },
   { path: 'recuperar', component: RecuperarPassword },
   { path: 'nueva-password', component: NuevaPassword },
-  { path: 'inicio', component: Inicio }
+  { path: 'inicio', component: Inicio },
+  { path: 'perfil', component: Perfil },
+  { path: 'perfil/:carnet', component: Perfil }
 ];

@@ -58,16 +58,47 @@
 .post-content { padding: 15px 0; line-height: 1.5; }
 .post-actions { display: flex; gap: 10px; border-top: 1px solid #eee; padding-top: 10px; }
 
-.create-post {
-    cursor: pointer;
+.search-users-section {
+    display: flex;
+    gap: 8px;
     margin-bottom: 20px;
-    color: #65676b;
+    align-items: center;
 }
 
-.input-fake {
+.search-users-input {
+    flex: 1;
     background: #f0f2f5;
-    padding: 12px;
+    padding: 12px 16px;
     border-radius: 20px;
+    border: none;
+    outline: none;
+    font-size: 14px;
+    color: #65676b;
+    transition: background-color 0.2s;
+}
+
+.search-users-input:focus {
+    background: #e4e6eb;
+}
+
+.search-users-input::placeholder {
+    color: #999;
+}
+
+.btn-buscar-user {
+    background: #1877f2;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 14px;
+    transition: background-color 0.2s;
+}
+
+.btn-buscar-user:hover {
+    background: #0a66c2;
 }
 
 /* Botón flotante circular en la esquina inferior derecha */
@@ -170,4 +201,52 @@
   font-size: 15px;
   line-height: 1.6;
   color: #1c1e21;
+}
+
+/* Estilos de botones */
+.btn-logout, .btn-profile {
+  width: 100%;
+  padding: 10px;
+  margin-top: 10px;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s;
+  font-size: 14px;
+}
+
+.btn-profile {
+  background: #1877f2;
+  color: white;
+}
+
+.btn-profile:hover {
+  background: #165ec9;
+}
+
+.btn-logout {
+  background: #e0245e;
+  color: white;
+}
+
+.btn-logout:hover {
+  background: #c01845;
+}
+
+.post-actions button {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  background: #f0f2f5;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s;
+  font-size: 12px;
+}
+
+.post-actions button:hover {
+  background: #e4e6eb;
+  border-color: #999;
 }

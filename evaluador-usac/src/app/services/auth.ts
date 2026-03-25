@@ -53,4 +53,45 @@ export class AuthService {
   crearPublicacion(datos: any) {
     return this.http.post(`${this.URL}/publicaciones`, datos);
   }
+
+  // --- MÉTODOS DE COMENTARIOS ---
+
+  // Obtener comentarios de una publicación
+  getComentarios(id_publicacion: number): Observable<any[]> {
+    return this.http.get<any[]>(`${this.URL}/comentarios/${id_publicacion}`);
+  }
+
+  // Crear un nuevo comentario
+  crearComentario(datos: any) {
+    return this.http.post(`${this.URL}/comentarios`, datos);
+  }
+
+  // --- MÉTODOS DE PERFIL ---
+
+  // Obtener usuario por carnet
+  obtenerUserPorCarnet(carnet: string): Observable<any> {
+    return this.http.get<any>(`${this.URL}/usuario/${carnet}`);
+  }
+
+  // Actualizar datos del perfil propio
+  actualizarPerfil(datos: any) {
+    return this.http.put(`${this.URL}/usuario/actualizar`, datos);
+  }
+
+  // --- MÉTODOS DE CURSOS APROBADOS ---
+
+  // Obtener cursos aprobados de un usuario
+  getCursosAprobados(registro_academico: string): Observable<any[]> {
+    return this.http.get<any[]>(`${this.URL}/cursos-aprobados/${registro_academico}`);
+  }
+
+  // Agregar un curso aprobado
+  agregarCursoAprobado(datos: any) {
+    return this.http.post(`${this.URL}/cursos-aprobados`, datos);
+  }
+
+  // Eliminar un curso aprobado
+  eliminarCursoAprobado(datos: any) {
+    return this.http.post(`${this.URL}/cursos-aprobados/eliminar`, datos);
+  }
 } // <--- Asegúrate de que esta llave cierre AL FINAL de todo

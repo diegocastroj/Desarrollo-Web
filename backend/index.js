@@ -229,4 +229,103 @@ app.get('/api/publicaciones', (req, res) => {
         
         res.json(results);
     });
+
+        // Guardar un comentario
+    app.post('/api/comentarios', (req, res) => {
+        const { id_publicacion, registro_academico, texto_comentario } = req.body;
+        const sql = `INSERT INTO comentario (id_publicacion, registro_academico, texto_comentario) VALUES (?, ?, ?)`;
+        db.query(sql, [id_publicacion, registro_academico, texto_comentario], (err, result) => {
+            if (err) return res.status(500).json({ error: err.message });
+            res.json({ mensaje: "Comentario guardado" });
+        });
+    });
+
+    // Traer comentarios de una publicación
+    app.get('/api/comentarios/:id', (req, res) => {
+        const sql = `
+            SELECT c.texto_comentario, e.nombres, e.apellidos 
+            FROM comentario c 
+            JOIN estudiante e ON c.registro_academico = e.registro_academico 
+            WHERE c.id_publicacion = ? 
+            ORDER BY c.fecha_comentario ASC`;
+        db.query(sql, [req.params.id], (err, results) => {
+            if (err) return res.status(500).json({ error: err.message });
+            res.json(results);
+        });
+    });
+
+    // --- RUTAS DE PERFIL ---
+    
+    // Obtener usuario por carnet
+    app.get('/api/usuario/:carnet', (req, res) => {
+        const sql = 'SELECT registro_academico, nombres, apellidos, correo FROM estudiante WHERE registro_academico = ?';
+        db.query(sql, [req.params.carnet], (err, results) => {
+            if (err) return res.status(500).json({ error: err.message });
+            res.json(results);
+        });
+    });
+
+    // Actualizar datos del usuario (solo propio perfil)
+    app.put('/api/usuario/actualizar', (req, res) => {
+        const { registro_academico, nombres, apellidos, correo } = req.body;
+        const sql = 'UPDATE estudiante SET nombres = ?, apellidos = ?, correo = ? WHERE registro_academico = ?';
+        db.query(sql, [nombres, apellidos, correo, registro_academico], (err, result) => {
+            if (err) return res.status(500).json({ error: err.message });
+            if (result.affectedRows === 0) {
+                return res.status(404).json({ error: 'Usuario no encontrado' });
+            }
+            res.json({ mensaje: 'Perfil actualizado exitosamente' });
+        });
+    });
+
+    // ========== ENDPOINTS DE CURSOS APROBADOS ==========
+
+    // Obtener cursos aprobados de un usuario
+    app.get('/api/cursos-aprobados/:registro_academico', (req, res) => {
+        const sql = `
+            SELECT c.codigo_curso, c.nombre_curso, c.creditos
+            FROM curso c
+            INNER JOIN estudiante_curso_aprobado eca ON c.codigo_curso = eca.codigo_curso
+            WHERE eca.registro_academico = ?
+        `;
+        db.query(sql, [req.params.registro_academico], (err, results) => {
+            if (err) return res.status(500).json({ error: err.message });
+            res.json(results);
+        });
+    });
+
+    // Agregar un curso aprobado
+    app.post('/api/cursos-aprobados', (req, res) => {
+        const { registro_academico, codigo_curso } = req.body;
+
+        // Verificar que el curso no esté ya aprobado
+        const checkSql = 'SELECT * FROM estudiante_curso_aprobado WHERE registro_academico = ? AND codigo_curso = ?';
+        db.query(checkSql, [registro_academico, codigo_curso], (err, results) => {
+            if (err) return res.status(500).json({ error: err.message });
+            
+            if (results.length > 0) {
+                return res.status(400).json({ error: 'Este curso ya está aprobado' });
+            }
+
+            // Insertar el curso aprobado
+            const insertSql = 'INSERT INTO estudiante_curso_aprobado (registro_academico, codigo_curso) VALUES (?, ?)';
+            db.query(insertSql, [registro_academico, codigo_curso], (err, result) => {
+                if (err) return res.status(500).json({ error: err.message });
+                res.json({ mensaje: 'Curso aprobado agregado exitosamente', id: result.insertId });
+            });
+        });
+    });
+
+    // Eliminar un curso aprobado
+    app.post('/api/cursos-aprobados/eliminar', (req, res) => {
+        const { registro_academico, codigo_curso } = req.body;
+        const sql = 'DELETE FROM estudiante_curso_aprobado WHERE registro_academico = ? AND codigo_curso = ?';
+        db.query(sql, [registro_academico, codigo_curso], (err, result) => {
+            if (err) return res.status(500).json({ error: err.message });
+            if (result.affectedRows === 0) {
+                return res.status(404).json({ error: 'Curso no encontrado en aprobados' });
+            }
+            res.json({ mensaje: 'Curso aprobado eliminado exitosamente' });
+        });
+    });
 });

@@ -1,0 +1,165 @@
+<div class="profile-container">
+  <div class="profile-header">
+    <button (click)="volverAlInicio()" class="btn-back">← Volver al Inicio</button>
+    <h1>Perfil de Usuario</h1>
+  </div>
+
+  <!-- BÚSQUEDA DE USUARIO (Si no estamos viendo un perfil específico) -->
+  <div class="search-section" *ngIf="!perfilData">
+    <h2>Buscar Usuario</h2>
+    <div class="search-form">
+      <input 
+        type="text" 
+        [(ngModel)]="carbuscado" 
+        placeholder="Ingresa el Registro Personal (Carnet)" 
+        class="search-input"
+        (keyup.enter)="buscarYCargarPerfil(carbuscado)"
+      >
+      <button (click)="buscarYCargarPerfil(carbuscado)" class="btn-search">Buscar</button>
+    </div>
+  </div>
+
+  <!-- MENSAJE DE RESPUESTA -->
+  <div *ngIf="mensaje" [ngClass]="{'mensaje-exito': tipoMensaje === 'exito', 'mensaje-error': tipoMensaje === 'error'}" class="mensaje">
+    {{ mensaje }}
+  </div>
+
+  <!-- PERFIL ENCONTRADO -->
+  <div *ngIf="perfilData" class="profile-card">
+    <div class="profile-content">
+      <div class="avatar-grande">{{ perfilData.nombres.charAt(0) }}{{ perfilData.apellidos.charAt(0) }}</div>
+      
+      <div class="profile-info">
+        <div *ngIf="!modoEdicion" class="info-display">
+          <p><strong>Nombres:</strong> {{ perfilData.nombres }}</p>
+          <p><strong>Apellidos:</strong> {{ perfilData.apellidos }}</p>
+          <p><strong>Registro Personal:</strong> {{ perfilData.registro_academico }}</p>
+          <p><strong>Correo:</strong> {{ perfilData.correo }}</p>
+        </div>
+
+        <div *ngIf="modoEdicion" class="info-edit">
+          <div class="form-group">
+            <label>Nombres</label>
+            <input type="text" [(ngModel)]="datosEditados.nombres" class="input-field">
+          </div>
+          <div class="form-group">
+            <label>Apellidos</label>
+            <input type="text" [(ngModel)]="datosEditados.apellidos" class="input-field">
+          </div>
+          <div class="form-group">
+            <label>Correo</label>
+            <input type="email" [(ngModel)]="datosEditados.correo" class="input-field">
+          </div>
+          <p style="color: #999; font-size: 12px; margin-top: 10px;">
+            * El Registro Personal no puede ser modificado
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- BOTONES DE ACCIÓN (solo para perfil propio) -->
+    <div *ngIf="esPropioPerfil" class="profile-actions">
+      <button 
+        *ngIf="!modoEdicion" 
+        (click)="activarEdicion()" 
+        class="btn-editar"
+      >
+        ✏️ Editar Perfil
+      </button>
+      
+      <div *ngIf="modoEdicion" class="actions-edit">
+        <button (click)="guardarCambios()" class="btn-guardar">💾 Guardar Cambios</button>
+        <button (click)="cancelarEdicion()" class="btn-cancelar">❌ Cancelar</button>
+      </div>
+    </div>
+
+    <!-- BOTÓN PARA BUSCAR OTRO USUARIO -->
+    <div class="profile-actions" *ngIf="!esPropioPerfil">
+      <button (click)="activarBusqueda()" class="btn-buscar-otro">🔍 Buscar Otro Usuario</button>
+    </div>
+
+    <!-- MENSAJE SI ES OTRO PERFIL -->
+    <div *ngIf="!esPropioPerfil" class="info-otros-perfil">
+      📋 Estás viendo el perfil de otro usuario (solo lectura)
+    </div>
+
+    <!-- SECCIÓN DE CURSOS APROBADOS -->
+    <div class="cursos-section">
+      <div class="cursos-header">
+        <h3>📚 Cursos Aprobados</h3>
+        <button 
+          *ngIf="esPropioPerfil && !mostrarAgregarCurso" 
+          (click)="abrirFormularioAgregarCurso()" 
+          class="btn-agregar-curso"
+        >
+          + Agregar Curso
+        </button>
+        <button 
+          *ngIf="mostrarAgregarCurso" 
+          (click)="cerrarFormularioAgregarCurso()" 
+          class="btn-cancelar-agregar"
+        >
+          ✕ Cancelar
+        </button>
+      </div>
+
+      <!-- FORMULARIO PARA AGREGAR CURSO (Solo perfil propio) -->
+      <div *ngIf="mostrarAgregarCurso && esPropioPerfil" class="form-agregar-curso">
+        <h4>Selecciona un curso para agregar</h4>
+        <div class="form-group">
+          <select [(ngModel)]="cursoSeleccionado" class="select-curso">
+            <option [ngValue]="null">-- Selecciona un curso --</option>
+            <option *ngFor="let curso of cursosParaAgregar" [ngValue]="curso">
+              {{ curso.nombre_curso }} ({{ curso.codigo_curso }}) - {{ curso.creditos }} créditos
+            </option>
+          </select>
+        </div>
+        <button (click)="agregarCursoAprobado()" class="btn-confirmar-agregar">✓ Agregar Curso</button>
+      </div>
+
+      <!-- LISTA DE CURSOS APROBADOS -->
+      <div class="cursos-list">
+        <div *ngIf="cursosAprobados.length === 0" class="cursos-vacio">
+          📭 No hay cursos aprobados aún
+        </div>
+
+        <div *ngFor="let curso of cursosAprobados" class="curso-card">
+          <div class="curso-info">
+            <h4>{{ curso.nombre_curso }}</h4>
+            <p class="codigo-curso">Código: {{ curso.codigo_curso }}</p>
+            <p class="creditos-curso">{{ curso.creditos }} créditos</p>
+          </div>
+          <div class="curso-actions">
+            <button 
+              *ngIf="esPropioPerfil" 
+              (click)="eliminarCursoAprobado(curso.codigo_curso)" 
+              class="btn-eliminar"
+            >
+              🗑️
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- TOTAL DE CRÉDITOS -->
+      <div class="total-creditos">
+        <strong>Total de Créditos:</strong> {{ obtenerTotalCreditos() }}
+      </div>
+    </div>
+  </div>
+
+  <!-- SECCIÓN DE BÚSQUEDA DE OTROS USUARIOS -->
+  <div class="search-section" *ngIf="mostrarBusqueda">
+    <h2>Buscar Otro Usuario</h2>
+    <div class="search-form">
+      <input 
+        type="text" 
+        [(ngModel)]="carbuscado" 
+        placeholder="Ingresa el Registro Personal (Carnet)" 
+        class="search-input"
+        (keyup.enter)="buscarYCargarPerfil(carbuscado)"
+      >
+      <button (click)="buscarYCargarPerfil(carbuscado)" class="btn-search">Buscar</button>
+    </div>
+  </div>
+</div>
