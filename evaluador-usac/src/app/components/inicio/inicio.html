@@ -1,7 +1,9 @@
 <div class="dashboard-container">
   <aside class="sidebar">
     <div class="user-card">
-      <div class="avatar-circle">{{ nombreUsuario }}</div>
+      <div class="avatar-circle" *ngIf="usuarioLogueado">
+        {{ usuarioLogueado.nombres.charAt(0) }}{{ usuarioLogueado.apellidos.charAt(0) }}
+      </div>
       <h3>{{ nombreUsuario }}</h3>
       <p>ID: {{ carnetUsuario }}</p>
       <button class="btn-profile" [routerLink]="['/perfil', carnetUsuario]">👤 Mi Perfil</button>

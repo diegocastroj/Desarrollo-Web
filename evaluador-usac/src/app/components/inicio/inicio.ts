@@ -12,13 +12,16 @@ import { AuthService } from '../../services/auth'; // <--- Tu servicio
   styleUrl: './inicio.css'
 })
 export class Inicio implements OnInit {
-  // Datos del Usuario Logueado
+
   nombreUsuario: string = '';
   carnetUsuario: string = '';
   textoBusqueda: string = '';
   carnetBusqueda: string = '';
   filtroCurso: string = '';
   filtroCatedratico: string = '';
+
+  usuarioLogueado: any = null;
+  
 
   // Control del Modal y Listas
   mostrarModal: boolean = false;
@@ -27,10 +30,10 @@ export class Inicio implements OnInit {
   
   cursos: any[] = [];
   catedraticos: any[] = [];
-  publicaciones: any[] = []; // Aquí guardaremos las de la DB
-  comentarios: any[] = []; // Para almacenar comentarios de la publicación
+  publicaciones: any[] = []; 
+  comentarios: any[] = []; 
 
-  // Objeto para capturar la nueva publicación
+
   nuevaPost = {
     tipo: 'curso',
     id_curso: null,
@@ -38,7 +41,6 @@ export class Inicio implements OnInit {
     mensaje: ''
   };
 
-  // Objeto para capturar el nuevo comentario
   nuevoComentario = {
     texto: ''
   };
@@ -46,17 +48,18 @@ export class Inicio implements OnInit {
   constructor(private authService: AuthService, private router: Router) {}
 
   ngOnInit() {
-    // 1. Verificar sesión
+    // Verifica sesión
     const datos = localStorage.getItem('usuario_logueado');
     if (datos) {
       const user = JSON.parse(datos);
+      this.usuarioLogueado = user;
       this.nombreUsuario = user.nombres + ' ' + user.apellidos;
       this.carnetUsuario = user.registro_academico;
     } else {
       this.router.navigate(['/login']);
     }
 
-    // 2. Cargar datos iniciales
+    // Carga datos iniciales
     this.cargarDatosIniciales();
     this.obtenerPublicaciones();
   }
@@ -110,10 +113,9 @@ export class Inicio implements OnInit {
     };
   }
 
-  // Lógica para enviar la publicación
+
 publicar() {
-  // 1. Forzamos la recuperación del carnet justo antes de publicar 
-  // por si acaso la variable global falló.
+
   const datosUser = localStorage.getItem('usuario_logueado');
   if (!datosUser) {
     alert("Sesión expirada. Por favor inicia sesión de nuevo.");
@@ -121,11 +123,11 @@ publicar() {
   }
   
   const usuario = JSON.parse(datosUser);
-  const carnetLogueado = usuario.registro_academico; // <--- Verifica que se llame así en tu localStorage
+  const carnetLogueado = usuario.registro_academico; 
 
-  // 2. Construimos el paquete de datos
+ 
   const payload = {
-    registro_academico: carnetLogueado, // <--- AQUÍ ESTÁ LA CLAVE
+    registro_academico: carnetLogueado, 
     id_curso: this.nuevaPost.tipo === 'curso' ? this.nuevaPost.id_curso : null,
     id_catedratico: this.nuevaPost.tipo === 'catedratico' ? this.nuevaPost.id_catedratico : null,
     mensaje: this.nuevaPost.mensaje
@@ -160,7 +162,7 @@ publicar() {
     });
   }
 
-  // --- MÉTODOS DE COMENTARIOS ---
+  // MÉTODOS DE COMENTARIOS 
 
   abrirComentarios(id_publicacion: number) {
     this.id_publicacion_comentarios = id_publicacion;

@@ -32,66 +32,56 @@ export class AuthService {
     return this.http.post(`${this.URL}/recuperar`, datos);
   }
 
-  // --- MÉTODOS DE CONTENIDO (FEED) ---
+  //MÉTODOS DE CONTENIDO (FEED)
 
-  // Obtener todos los cursos para el select
   getCursos(): Observable<any[]> {
     return this.http.get<any[]>(`${this.URL}/cursos`);
   }
 
-  // Obtener todos los catedráticos para el select
   getCatedraticos(): Observable<any[]> {
     return this.http.get<any[]>(`${this.URL}/catedraticos`);
   }
 
-  // Obtener el feed de publicaciones
   getPublicaciones(): Observable<any[]> {
     return this.http.get<any[]>(`${this.URL}/publicaciones`);
   }
 
-  // Enviar la nueva publicación
   crearPublicacion(datos: any) {
     return this.http.post(`${this.URL}/publicaciones`, datos);
   }
 
-  // --- MÉTODOS DE COMENTARIOS ---
+  // MÉTODOS DE COMENTARIOS
 
-  // Obtener comentarios de una publicación
+  
   getComentarios(id_publicacion: number): Observable<any[]> {
     return this.http.get<any[]>(`${this.URL}/comentarios/${id_publicacion}`);
   }
 
-  // Crear un nuevo comentario
   crearComentario(datos: any) {
     return this.http.post(`${this.URL}/comentarios`, datos);
   }
 
-  // --- MÉTODOS DE PERFIL ---
-
-  // Obtener usuario por carnet
+  //MÉTODOS DE PERFIL 
+  
   obtenerUserPorCarnet(carnet: string): Observable<any> {
     return this.http.get<any>(`${this.URL}/usuario/${carnet}`);
   }
 
-  // Actualizar datos del perfil propio
   actualizarPerfil(datos: any) {
     return this.http.put(`${this.URL}/usuario/actualizar`, datos);
   }
 
-  // --- MÉTODOS DE CURSOS APROBADOS ---
+  //MÉTODOS DE CURSOS APROBADOS
 
-  // Obtener cursos aprobados de un usuario
   getCursosAprobados(registro_academico: string): Observable<any[]> {
     return this.http.get<any[]>(`${this.URL}/cursos-aprobados/${registro_academico}`);
   }
 
-  // Agregar un curso aprobado
   agregarCursoAprobado(datos: any) {
     return this.http.post(`${this.URL}/cursos-aprobados`, datos);
   }
 
-  // Eliminar un curso aprobado
   eliminarCursoAprobado(datos: any) {
     return this.http.post(`${this.URL}/cursos-aprobados/eliminar`, datos);
   }
-} // <--- Asegúrate de que esta llave cierre AL FINAL de todo
+}

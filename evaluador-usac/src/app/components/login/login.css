@@ -1,10 +1,9 @@
-/* Reseteo básico para que ocupe toda la pantalla */
+/* para que ocupe toda la pantalla */
 :host {
   display: block;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-/* 1. El contenedor principal centra el cuadro a la fuerza */
 .login-container {
   position: relative;
   height: 100vh; 
@@ -33,7 +32,7 @@
   z-index: 1; /* Lo manda al fondo */
 }
 
-/*La imagen real del escudo: Toca arriba/abajo y se corta a la mitad */
+
 .logo-img-real {
   height: 95vh; /* Toca el borde superior */
   width: auto;  /*La mantiene como un circulo*/
@@ -49,7 +48,7 @@ opacity: 0.55;
 opacity: 0.55; 
 }
 
-/* La tarjeta blanca del formulario: En el centro y SOBRE el escudo */
+/* La tarjeta blanca del formulario*/
 .login-box {
   background-color: white;
   padding: 40px;

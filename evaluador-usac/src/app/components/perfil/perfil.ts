@@ -76,16 +76,13 @@ export class Perfil implements OnInit {
           this.esPropioPerfil = this.usuarioLogueado && 
             this.usuarioLogueado.registro_academico === this.perfilData.registro_academico;
           
-          // Ocultar la sección de búsqueda
+         
           this.mostrarBusqueda = false;
           
-          // Cargar cursos aprobados del usuario
           this.cargarCursosAprobados(carnet);
           
-          // Cargar todos los cursos disponibles (para agregar nuevos)
           this.cargarCursosDisponibles();
           
-          // Si es propio perfil, cargar los datos para edición
           if (this.esPropioPerfil) {
             this.cargarDatosEdicion();
           }
@@ -160,7 +157,7 @@ export class Perfil implements OnInit {
     }, 3000);
   }
 
-  // ========== MÉTODOS DE CURSOS APROBADOS ==========
+  // Metodos cursos aprobados
 
   cargarCursosAprobados(carnet: string) {
     this.authService.getCursosAprobados(carnet).subscribe({

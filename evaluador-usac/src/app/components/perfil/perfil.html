@@ -4,7 +4,7 @@
     <h1>Perfil de Usuario</h1>
   </div>
 
-  <!-- BÚSQUEDA DE USUARIO (Si no estamos viendo un perfil específico) -->
+  <!-- BÚSQUEDA DE USUARIO  -->
   <div class="search-section" *ngIf="!perfilData">
     <h2>Buscar Usuario</h2>
     <div class="search-form">
@@ -57,7 +57,6 @@
       </div>
     </div>
 
-    <!-- BOTONES DE ACCIÓN (solo para perfil propio) -->
     <div *ngIf="esPropioPerfil" class="profile-actions">
       <button 
         *ngIf="!modoEdicion" 
@@ -73,17 +72,9 @@
       </div>
     </div>
 
-    <!-- BOTÓN PARA BUSCAR OTRO USUARIO -->
-    <div class="profile-actions" *ngIf="!esPropioPerfil">
-      <button (click)="activarBusqueda()" class="btn-buscar-otro">🔍 Buscar Otro Usuario</button>
-    </div>
 
-    <!-- MENSAJE SI ES OTRO PERFIL -->
-    <div *ngIf="!esPropioPerfil" class="info-otros-perfil">
-      📋 Estás viendo el perfil de otro usuario (solo lectura)
-    </div>
 
-    <!-- SECCIÓN DE CURSOS APROBADOS -->
+    <!-- cursos aprobados -->
     <div class="cursos-section">
       <div class="cursos-header">
         <h3>📚 Cursos Aprobados</h3>
@@ -103,7 +94,7 @@
         </button>
       </div>
 
-      <!-- FORMULARIO PARA AGREGAR CURSO (Solo perfil propio) -->
+      <!-- agregar curso-->
       <div *ngIf="mostrarAgregarCurso && esPropioPerfil" class="form-agregar-curso">
         <h4>Selecciona un curso para agregar</h4>
         <div class="form-group">
@@ -117,7 +108,7 @@
         <button (click)="agregarCursoAprobado()" class="btn-confirmar-agregar">✓ Agregar Curso</button>
       </div>
 
-      <!-- LISTA DE CURSOS APROBADOS -->
+      <!-- lista cursos aprobados -->
       <div class="cursos-list">
         <div *ngIf="cursosAprobados.length === 0" class="cursos-vacio">
           📭 No hay cursos aprobados aún
@@ -141,14 +132,14 @@
         </div>
       </div>
 
-      <!-- TOTAL DE CRÉDITOS -->
+      <!-- creditos -->
       <div class="total-creditos">
         <strong>Total de Créditos:</strong> {{ obtenerTotalCreditos() }}
       </div>
     </div>
   </div>
 
-  <!-- SECCIÓN DE BÚSQUEDA DE OTROS USUARIOS -->
+  <!-- buscar otro usuario -->
   <div class="search-section" *ngIf="mostrarBusqueda">
     <h2>Buscar Otro Usuario</h2>
     <div class="search-form">

@@ -28,13 +28,11 @@ export class RecuperarPassword {
       return;
     }
 
-    // 1. Llamamos a una función de validación en el servicio
+
     this.authService.validarUsuario(this.recoveryData).subscribe({
       next: (res) => {
-        // 2. Si es válido, guardamos el carnet temporalmente
         sessionStorage.setItem('carnet_pendiente', this.recoveryData.carnet);
         
-        // 3. Saltamos a la pantalla de la nueva contraseña
         this.router.navigate(['/nueva-password']);
       },
       error: (err) => {

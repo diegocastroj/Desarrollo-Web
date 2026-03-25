@@ -8,11 +8,11 @@ const app = express();
 app.use(cors()); // Permite que Angular se comunique con este servidor
 app.use(express.json()); // Permite leer datos en formato JSON
 
-// Configuración de tu base de datos (La conexión)
+// Configuración la base de datos (La conexión)
 const db = mysql.createConnection({
     host: 'localhost',
     user: 'root',
-    password: 'asdf', // <-- ¡Cambia esto por tu contraseña de ayer!
+    password: 'asdf',
     database: 'evaluador_usac',
     port: 3306
 });
@@ -26,39 +26,32 @@ db.connect((err) => {
     console.log('¡Conectado exitosamente a la bodega de datos MySQL!');
 });
 
-// Una ruta de prueba para ver si el servidor responde
-app.get('/', (req, res) => {
-    res.send('¡Hola! El servidor backend está vivo y esperando órdenes.');
-});
 
-// Ruta para pedir todos los cursos del pensum
 app.get('/api/cursos', (req, res) => {
-    // Aquí escribimos el mismo comando SQL que usaste ayer en Workbench
-    const comandoSQL = 'SELECT * FROM curso';
+    
+    const comandoSQL = 'SELECT * FROM curso'; // comando obitiene cursos
     
     db.query(comandoSQL, (err, resultados) => {
         if (err) {
             res.status(500).send('Hubo un error en la base de datos');
             return;
         }
-        // Si todo sale bien, enviamos los resultados en formato JSON
-        res.json(resultados); 
+        res.json(resultados); // los resutados se envian en formato JSON a Angular para que los pueda usar
     });
 });
 
 
-// Ruta para pedir todos los ingenieros/catedráticos
+
 app.get('/api/catedraticos', (req, res) => {
-    // El comando SQL para traer la tabla de los maestros
-    const comandoSQL = 'SELECT * FROM catedratico';
+
+    const comandoSQL = 'SELECT * FROM catedratico'; //obtiene catedraticos
     
     db.query(comandoSQL, (err, resultados) => {
         if (err) {
             res.status(500).send('Hubo un error en la base de datos');
             return;
         }
-        // Enviamos la lista completa en formato JSON
-        res.json(resultados); 
+        res.json(resultados); // en JASON a angular
     });
 });
 
@@ -68,18 +61,17 @@ app.listen(PORT, () => {
     console.log(`Servidor del mesero corriendo en http://localhost:${PORT}`);
 });
 
-// RUTA 1: Registro de nuevo usuario (CORREGIDA)
+
 app.post('/api/registro', (req, res) => {
     // 1. Extraemos con los nombres que vienen de Angular
     const { carnet, nombres, apellidos, correo, pass } = req.body; 
 
     // 2. Query con los nombres de tus columnas en MySQL
-    // Nota: Agregamos los nombres de las columnas antes de VALUES para evitar errores de orden
     const sql = 'INSERT INTO estudiante (registro_academico, nombres, apellidos, correo, contrasena) VALUES (?, ?, ?, ?, ?)';
 
     db.query(sql, [carnet, nombres, apellidos, correo, pass], (err, result) => {
         if (err) {
-            // Si el error es por carnet duplicado
+            // si el canet ya existe
             if (err.code === 'ER_DUP_ENTRY') {
                 return res.status(400).json({ mensaje: "El carnet ya existe" });
             }
@@ -89,11 +81,11 @@ app.post('/api/registro', (req, res) => {
     });
 });
 
-// RUTA: Verificar si el carnet y correo existen y coinciden
+
 app.post('/api/validar-usuario', (req, res) => {
     const { carnet, correo } = req.body;
     
-    // Buscamos si existe un estudiante con ese carnet Y ese correo (case-insensitive)
+    // Buscamos si existe un estudiante con ese carnet Y ese correo
     const sql = 'SELECT * FROM estudiante WHERE registro_academico = ? AND LOWER(correo) = LOWER(?)';
 
     db.query(sql, [carnet, correo], (err, results) => {
@@ -110,7 +102,6 @@ app.post('/api/validar-usuario', (req, res) => {
 });
 
 
-// RUTA: Login (Verificar carnet y contraseña)
 app.post('/api/login', (req, res) => {
     const { carnet, password } = req.body;
     const sql = 'SELECT * FROM estudiante WHERE registro_academico = ? AND contrasena = ?';
@@ -125,7 +116,7 @@ app.post('/api/login', (req, res) => {
     });
 });
 
-// RUTA DEBUG: Ver todos los usuarios registrados (para debuggear)
+
 app.get('/api/debug/estudiantes', (req, res) => {
     const sql = 'SELECT registro_academico, nombres, apellidos, correo FROM estudiante';
     
@@ -135,7 +126,6 @@ app.get('/api/debug/estudiantes', (req, res) => {
     });
 });
 
-// RUTA 3: Recuperar/Cambiar Contraseña
 app.post('/api/recuperar', (req, res) => {
     const { carnet, nuevaPass } = req.body;
 
@@ -158,8 +148,6 @@ app.post('/api/recuperar', (req, res) => {
 app.post('/api/publicaciones', (req, res) => {
     const { registro_academico, id_curso, id_catedratico, mensaje } = req.body;
 
-    console.log('📥 BACKEND - Datos recibidos:', { registro_academico, id_curso, id_catedratico, mensaje });
-    console.log('📥 BACKEND - req.body completo:', req.body);
 
     const sql = `INSERT INTO publicacion (registro_academico, id_curso, id_catedratico, mensaje) 
                  VALUES (?, ?, ?, ?)`;
@@ -172,7 +160,7 @@ app.post('/api/publicaciones', (req, res) => {
     });
 });
 
-// 1. Obtener Cursos
+
 app.get('/api/cursos', (req, res) => {
     db.query('SELECT id_curso, nombre_curso FROM curso', (err, results) => {
         if (err) return res.status(500).send(err);
@@ -180,10 +168,9 @@ app.get('/api/cursos', (req, res) => {
     });
 });
 
-// 2. Obtener Catedráticos
-// Ruta corregida a singular
+
 app.get('/api/catedraticos', (req, res) => {
-    // Usamos 'catedratico' sin la 's'
+
     db.query('SELECT id_catedratico, nombres_catedratico FROM catedratico', (err, results) => {
         if (err) {
             return res.status(500).send(err);
@@ -192,7 +179,7 @@ app.get('/api/catedraticos', (req, res) => {
     });
 });
 
-// 3. Obtener Publicaciones (El Query "Maestro")
+
 app.get('/api/publicaciones', (req, res) => {
     const sql = `
         SELECT 
@@ -211,21 +198,13 @@ app.get('/api/publicaciones', (req, res) => {
         LEFT JOIN curso c ON p.id_curso = c.codigo_curso
         LEFT JOIN catedratico cat ON p.id_catedratico = cat.id_catedratico
         ORDER BY p.fecha_creacion DESC`;
-
-    console.log('📥 GET /api/publicaciones - ejecutando query...');
     
     db.query(sql, (err, results) => {
         if (err) {
-            console.error('❌ Error en GET /api/publicaciones:', err.message);
-            console.error('❌ Código del error:', err.code);
-            console.error('📋 SQL que falló:', sql);
+
             return res.status(500).json({ error: err.message, code: err.code });
         }
         
-        console.log('✅ Publicaciones encontradas:', results.length);
-        if (results.length > 0) {
-            console.log('📋 Primer resultado:', results[0]);
-        }
         
         res.json(results);
     });
@@ -254,8 +233,6 @@ app.get('/api/publicaciones', (req, res) => {
         });
     });
 
-    // --- RUTAS DE PERFIL ---
-    
     // Obtener usuario por carnet
     app.get('/api/usuario/:carnet', (req, res) => {
         const sql = 'SELECT registro_academico, nombres, apellidos, correo FROM estudiante WHERE registro_academico = ?';
@@ -265,7 +242,7 @@ app.get('/api/publicaciones', (req, res) => {
         });
     });
 
-    // Actualizar datos del usuario (solo propio perfil)
+    // Actualizar datos del usuario
     app.put('/api/usuario/actualizar', (req, res) => {
         const { registro_academico, nombres, apellidos, correo } = req.body;
         const sql = 'UPDATE estudiante SET nombres = ?, apellidos = ?, correo = ? WHERE registro_academico = ?';
@@ -277,8 +254,6 @@ app.get('/api/publicaciones', (req, res) => {
             res.json({ mensaje: 'Perfil actualizado exitosamente' });
         });
     });
-
-    // ========== ENDPOINTS DE CURSOS APROBADOS ==========
 
     // Obtener cursos aprobados de un usuario
     app.get('/api/cursos-aprobados/:registro_academico', (req, res) => {

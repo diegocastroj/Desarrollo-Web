@@ -18,8 +18,7 @@ export class NuevaPassword {
   onCambiarPassword(event: Event) {
     event.preventDefault();
     
-    // Recuperamos el carnet que guardamos en el paso anterior
-    const carnet = sessionStorage.getItem('carnet_pendiente');
+    const carnet = sessionStorage.getItem('carnet_pendiente'); //obtiene el carnet guardado temporalmente
 
     if (!carnet) {
       alert('❌ Error: Debes validar tu identidad primero');
@@ -42,7 +41,7 @@ export class NuevaPassword {
       return;
     }
 
-    // Enviamos el carnet y la nueva pass al servidor para el UPDATE
+    // Enviamos el carnet y la nueva contraseña al servidor para el UPDATE
     this.authService.actualizarPassword({ carnet, nuevaPass: this.passData.nuevaPass }).subscribe({
       next: (res) => {
         alert('✅ Contraseña actualizada con éxito');

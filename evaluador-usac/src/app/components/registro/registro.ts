@@ -11,7 +11,6 @@ import { Router, RouterLink } from '@angular/router';
   styleUrl: './registro.css'
 })
 export class Registro {
-  // Estos nombres deben coincidir con los de tu tabla de MySQL
   userData = {
     carnet: '',
     nombres: '',
