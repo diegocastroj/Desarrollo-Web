@@ -38,7 +38,6 @@ app.get('/api/cursos', (req, res) => {
     
     db.query(comandoSQL, (err, resultados) => {
         if (err) {
-            console.error('Error al buscar los cursos:', err);
             res.status(500).send('Hubo un error en la base de datos');
             return;
         }
@@ -55,7 +54,6 @@ app.get('/api/catedraticos', (req, res) => {
     
     db.query(comandoSQL, (err, resultados) => {
         if (err) {
-            console.error('Error al buscar los catedráticos:', err);
             res.status(500).send('Hubo un error en la base de datos');
             return;
         }
@@ -81,14 +79,12 @@ app.post('/api/registro', (req, res) => {
 
     db.query(sql, [carnet, nombres, apellidos, correo, pass], (err, result) => {
         if (err) {
-            console.error("❌ Error en MySQL:", err.message);
             // Si el error es por carnet duplicado
             if (err.code === 'ER_DUP_ENTRY') {
                 return res.status(400).json({ mensaje: "El carnet ya existe" });
             }
             return res.status(500).json({ mensaje: "Error en servidor", detalle: err.message });
         }
-        console.log("✅ Usuario guardado con éxito");
         res.json({ mensaje: "Usuario registrado con éxito" });
     });
 });
@@ -97,26 +93,17 @@ app.post('/api/registro', (req, res) => {
 app.post('/api/validar-usuario', (req, res) => {
     const { carnet, correo } = req.body;
     
-    console.log("Intentando validar:", { carnet, correo }); // Debug
-    
     // Buscamos si existe un estudiante con ese carnet Y ese correo (case-insensitive)
     const sql = 'SELECT * FROM estudiante WHERE registro_academico = ? AND LOWER(correo) = LOWER(?)';
 
     db.query(sql, [carnet, correo], (err, results) => {
         if (err) {
-            console.error("Error en BD:", err);
             return res.status(500).json({ mensaje: "Error de servidor" });
         }
         
-        console.log("Resultados encontrados:", results.length); // Debug
-        
         if (results.length > 0) {
-            console.log("✅ Usuario validado:", results[0]); // Debug
-            console.log('Enviando respuesta al cliente: { mensaje: "Usuario validado correctamente" }');
             res.status(200).json({ mensaje: "Usuario validado correctamente" });
-            console.log('✅ Respuesta enviada al cliente');
         } else {
-            console.log("❌ No se encontraron coincidencias"); // Debug
             res.status(404).json({ mensaje: "Datos incorrectos" });
         }
     });
@@ -131,7 +118,7 @@ app.post('/api/login', (req, res) => {
     db.query(sql, [carnet, password], (err, results) => {
         if (err) return res.status(500).json({ error: "Error en DB" });
         if (results.length > 0) {
-            res.json({ mensaje: "OK", usuario: results });
+            res.json({ mensaje: "OK", usuario: results[0] });
         } else {
             res.status(401).json({ mensaje: "Error" });
         }
@@ -164,5 +151,82 @@ app.post('/api/recuperar', (req, res) => {
         }
         
         res.json({ mensaje: "Contraseña actualizada exitosamente" });
+    });
+});
+
+// RUTA: Guardar una nueva publicación
+app.post('/api/publicaciones', (req, res) => {
+    const { registro_academico, id_curso, id_catedratico, mensaje } = req.body;
+
+    console.log('📥 BACKEND - Datos recibidos:', { registro_academico, id_curso, id_catedratico, mensaje });
+    console.log('📥 BACKEND - req.body completo:', req.body);
+
+    const sql = `INSERT INTO publicacion (registro_academico, id_curso, id_catedratico, mensaje) 
+                 VALUES (?, ?, ?, ?)`;
+
+    db.query(sql, [registro_academico, id_curso, id_catedratico, mensaje], (err, result) => {
+        if (err) {
+            return res.status(500).json({ mensaje: "Error al crear publicación" });
+        }
+        res.json({ mensaje: "Publicación creada con éxito", id: result.insertId });
+    });
+});
+
+// 1. Obtener Cursos
+app.get('/api/cursos', (req, res) => {
+    db.query('SELECT id_curso, nombre_curso FROM curso', (err, results) => {
+        if (err) return res.status(500).send(err);
+        res.json(results);
+    });
+});
+
+// 2. Obtener Catedráticos
+// Ruta corregida a singular
+app.get('/api/catedraticos', (req, res) => {
+    // Usamos 'catedratico' sin la 's'
+    db.query('SELECT id_catedratico, nombres_catedratico FROM catedratico', (err, results) => {
+        if (err) {
+            return res.status(500).send(err);
+        }
+        res.json(results);
+    });
+});
+
+// 3. Obtener Publicaciones (El Query "Maestro")
+app.get('/api/publicaciones', (req, res) => {
+    const sql = `
+        SELECT 
+            p.id_publicacion, 
+            p.mensaje, 
+            p.fecha_creacion,
+            p.registro_academico,
+            p.id_curso,
+            p.id_catedratico,
+            e.nombres, 
+            e.apellidos,
+            c.nombre_curso AS nombre_curso,
+            cat.nombre_catedratico AS nombre_catedratico
+        FROM publicacion p
+        JOIN estudiante e ON p.registro_academico = e.registro_academico
+        LEFT JOIN curso c ON p.id_curso = c.codigo_curso
+        LEFT JOIN catedratico cat ON p.id_catedratico = cat.id_catedratico
+        ORDER BY p.fecha_creacion DESC`;
+
+    console.log('📥 GET /api/publicaciones - ejecutando query...');
+    
+    db.query(sql, (err, results) => {
+        if (err) {
+            console.error('❌ Error en GET /api/publicaciones:', err.message);
+            console.error('❌ Código del error:', err.code);
+            console.error('📋 SQL que falló:', sql);
+            return res.status(500).json({ error: err.message, code: err.code });
+        }
+        
+        console.log('✅ Publicaciones encontradas:', results.length);
+        if (results.length > 0) {
+            console.log('📋 Primer resultado:', results[0]);
+        }
+        
+        res.json(results);
     });
 });

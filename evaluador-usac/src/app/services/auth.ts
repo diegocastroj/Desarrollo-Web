@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { tap, catchError } from 'rxjs/operators';
-import { of } from 'rxjs';
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -11,49 +11,46 @@ export class AuthService {
 
   constructor(private http: HttpClient) { }
 
+  // --- MÉTODOS DE USUARIO ---
+
   registrar(usuario: any) {
     return this.http.post(`${this.URL}/registro`, usuario);
   }
 
-
   login(datos: any) {
-  // Mandamos 'carnet' y 'password' al servidor
-  return this.http.post('http://localhost:3000/api/login', {
-    carnet: datos.carnet,
-    password: datos.pass 
-  });
-}
+    return this.http.post(`${this.URL}/login`, {
+      carnet: datos.carnet,
+      password: datos.pass 
+    });
+  }
 
   validarUsuario(datos: any) {
-    console.log('🌐 [AuthService] Enviando POST a:', `${this.URL}/validar-usuario`);
-    console.log('🌐 [AuthService] Datos:', datos);
-    
-    return this.http.post(`${this.URL}/validar-usuario`, datos).pipe(
-      tap((response) => {
-        console.log('🌐 [AuthService] ✅ Respuesta recibida:', response);
-      }),
-      catchError((error) => {
-        console.error('🌐 [AuthService] ❌ Error capturado:', error);
-        console.error('🌐 [AuthService] Status:', error.status);
-        console.error('🌐 [AuthService] Message:', error.message);
-        throw error;
-      })
-    );
+    return this.http.post(`${this.URL}/validar-usuario`, datos);
   }
 
   actualizarPassword(datos: any) {
-    console.log('🌐 [AuthService] Enviando POST a:', `${this.URL}/recuperar`);
-    console.log('🌐 [AuthService] Datos:', datos);
-    
-    return this.http.post(`${this.URL}/recuperar`, datos).pipe(
-      tap((response) => {
-        console.log('🌐 [AuthService] ✅ Respuesta recibida:', response);
-      }),
-      catchError((error) => {
-        console.error('🌐 [AuthService] ❌ Error capturado:', error);
-        throw error;
-      })
-    );
+    return this.http.post(`${this.URL}/recuperar`, datos);
   }
-}
 
+  // --- MÉTODOS DE CONTENIDO (FEED) ---
+
+  // Obtener todos los cursos para el select
+  getCursos(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.URL}/cursos`);
+  }
+
+  // Obtener todos los catedráticos para el select
+  getCatedraticos(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.URL}/catedraticos`);
+  }
+
+  // Obtener el feed de publicaciones
+  getPublicaciones(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.URL}/publicaciones`);
+  }
+
+  // Enviar la nueva publicación
+  crearPublicacion(datos: any) {
+    return this.http.post(`${this.URL}/publicaciones`, datos);
+  }
+} // <--- Asegúrate de que esta llave cierre AL FINAL de todo

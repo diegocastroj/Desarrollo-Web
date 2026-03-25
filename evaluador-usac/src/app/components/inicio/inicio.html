@@ -1,1 +1,92 @@
-<p>inicio works!</p>
+<div class="dashboard-container">
+  <aside class="sidebar">
+    <div class="user-card">
+      <div class="avatar-circle">{{ nombreUsuario }}</div>
+      <h3>{{ nombreUsuario }}</h3>
+      <p>ID: {{ carnetUsuario }}</p>
+      <button class="btn-logout" (click)="cerrarSesion()">Cerrar Sesión</button>
+    </div>
+
+    <div class="filters">
+      <h4>🔍 Filtros de Búsqueda</h4>
+      <input type="text" placeholder="Buscar por Nombre..." class="search-bar">
+      
+      <label>Por Curso:</label>
+      <select class="select-filter">
+        <option>Todos los cursos</option>
+      </select>
+
+      <label>Por Catedrático:</label>
+      <select class="select-filter">
+        <option>Todos los catedráticos</option>
+      </select>
+    </div>
+  </aside>
+
+  <main class="feed">
+    <div class="create-post" routerLink="/crear-publicacion">
+      <div class="input-fake">¿Qué estás pensando hoy?</div>
+    </div>
+
+    <div class="post-card" *ngFor="let post of publicaciones">
+      <div class="post-header">
+        <div class="post-info">
+          <span class="author">{{ post.nombres }} {{ post.apellidos }}</span>
+          <span class="tag">Sobre: {{ post.nombre_curso || post.nombre_catedratico || 'Publicación General' }}</span>
+        </div>
+        <span class="date">{{ post.fecha_creacion | date:'short' }}</span>
+      </div>
+      <div class="post-content">
+        <p>{{ post.mensaje }}</p>
+      </div>
+      <div class="post-actions">
+        <button>💬 Comentarios</button>
+        <button>👤 Ver Perfil</button>
+      </div>
+    </div>
+  </main>
+</div>
+
+<button class="btn-flotante" (click)="abrirModal()">
+  + Nueva Publicación
+</button>
+
+<div class="modal-overlay" *ngIf="mostrarModal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>Crear Publicación</h3>
+      <button (click)="cerrarModal()" style="border:none; background:none; cursor:pointer;">❌</button>
+    </div>
+
+    <div class="form-group">
+      <label>¿Sobre qué quieres opinar?</label>
+      <select [(ngModel)]="nuevaPost.tipo">
+        <option value="curso">Un Curso</option>
+        <option value="catedratico">Un Catedrático</option>
+      </select>
+    </div>
+
+    <div class="form-group" *ngIf="nuevaPost.tipo === 'curso'">
+      <label>Selecciona el Curso</label>
+      <select [(ngModel)]="nuevaPost.id_curso" name="selCurso">
+        <option *ngFor="let c of cursos" [value]="c.codigo_curso">{{c.nombre_curso}}</option>
+      </select>
+    </div>
+
+    <div class="form-group" *ngIf="nuevaPost.tipo === 'catedratico'">
+      <label>Selecciona al Catedrático</label>
+      <select [(ngModel)]="nuevaPost.id_catedratico" name="selCatedratico">
+        <option *ngFor="let c of catedraticos" [value]="c.id_catedratico">
+          {{ c.nombre_catedratico }}
+        </option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label>Tu mensaje</label>
+      <textarea rows="4" [(ngModel)]="nuevaPost.mensaje" placeholder="Escribe aquí tu reseña..."></textarea>
+    </div>
+
+    <button class="btn-login" (click)="publicar()" style="width: 100%;">Publicar</button>
+  </div>
+</div>

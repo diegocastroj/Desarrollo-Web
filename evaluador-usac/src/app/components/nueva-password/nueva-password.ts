@@ -33,7 +33,7 @@ export class NuevaPassword {
     }
 
     if (this.passData.nuevaPass !== this.passData.confirmarPass) {
-      alert('⚠️ Las contraseñas no coinciden');
+      alert('⚠️ Las contraseñas no coinciden'); 
       return;
     }
 
@@ -42,20 +42,16 @@ export class NuevaPassword {
       return;
     }
 
-    console.log('Enviando solicitud de cambio de contraseña para carnet:', carnet);
-
     // Enviamos el carnet y la nueva pass al servidor para el UPDATE
     this.authService.actualizarPassword({ carnet, nuevaPass: this.passData.nuevaPass }).subscribe({
       next: (res) => {
-        
+        alert('✅ Contraseña actualizada con éxito');
         sessionStorage.removeItem('carnet_pendiente'); // Limpiamos la memoria
         this.router.navigate(['/login']);
       },
       error: (err) => {
-        
         alert('❌ Error al actualizar la contraseña. Intenta nuevamente.');
-      },
-      
+      }
     });
   }
 }

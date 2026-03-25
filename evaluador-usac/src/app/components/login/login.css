@@ -11,12 +11,12 @@
   width: 100%;
   background-color: #f0f2f5;
   display: flex;
-  justify-content: center; /* Centra el cuadro horizontalmente */
-  align-items: center;     /* Centra el cuadro verticalmente */
-  overflow: hidden;        /* Evita que salgan barras de scroll */
+  justify-content: center; 
+  align-items: center;     
+  overflow: hidden;     
 }
 
-/* 2. El contenedor del logo: Lo vuelve un "fantasma" pegado a la izquierda */
+/* El contenedor del logo:*/
 .univ-logo-peek {
   position: absolute;
   top: 0;
@@ -49,15 +49,15 @@ opacity: 0.55;
 opacity: 0.55; 
 }
 
-/* 4. La tarjeta blanca del formulario: En el centro y SOBRE el escudo */
+/* La tarjeta blanca del formulario: En el centro y SOBRE el escudo */
 .login-box {
   background-color: white;
   padding: 40px;
   border-radius: 10px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15); /* Sombra elegante */
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15); /* Sombra */
   width: 100%; 
   max-width: 350px;
-  position: relative; /* Necesario para que el z-index funcione */
+  position: relative; 
   z-index: 10;        /* Lo mantiene siempre por encima del escudo */
 }
 

@@ -28,23 +28,18 @@ export class RecuperarPassword {
       return;
     }
 
-    console.log('📤 Enviando datos:', this.recoveryData);
-
     // 1. Llamamos a una función de validación en el servicio
     this.authService.validarUsuario(this.recoveryData).subscribe({
       next: (res) => {
-        console.log('✅ Validación exitosa en el cliente. Respuesta:', res);
         // 2. Si es válido, guardamos el carnet temporalmente
         sessionStorage.setItem('carnet_pendiente', this.recoveryData.carnet);
-        console.log('✅ Carnet guardado en sessionStorage:', this.recoveryData.carnet);
         
         // 3. Saltamos a la pantalla de la nueva contraseña
-        console.log('🔄 Intentando navegar a /nueva-password');
-        console.log('Rutas disponibles:', this.router.config);
-        this.router.navigate(['nueva-password']);
-        
+        this.router.navigate(['/nueva-password']);
+      },
+      error: (err) => {
+        alert('❌ Los datos no coinciden con nuestros registros. Verifica tu carnet y correo electrónico.');
       }
-      
     });
   }
 } 

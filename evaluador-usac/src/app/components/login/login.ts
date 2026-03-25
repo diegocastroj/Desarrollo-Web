@@ -31,7 +31,6 @@ export class Login {
         this.router.navigate(['/inicio']); // Te manda al Inicio
       },
       error: (err) => {
-        console.error(err);
         alert('❌ Carnet o contraseña incorrectos.');
       }
     });
